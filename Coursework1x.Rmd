@@ -1,0 +1,331 @@
+---
+title: "Statistical Analysis and Modeling - Coursework 1"
+output:
+  html_document:
+    df_print: paged
+date: "01/12/2022"
+owner: Umer Bin Usman
+---
+
+## Installing Important Libraries
+
+
+```{r}
+install.packages("ggplot2")
+install.packages("gridExtra")
+install.packages("moments")
+install.packages("devtools")
+install.packages("corrplot")
+install.packages("dplyr")
+install.packages("randomForest")
+install.packages("Metrics")
+install.packages("car")
+install.packages("performance")
+```
+
+
+## Loading Libraries
+```{r}
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(lattice)
+library(scales)
+library(moments)
+library(devtools)
+library(corrplot)
+library(reshape2)
+library(dplyr)
+library(caret)
+library(car)
+library(randomForest)
+library(Metrics)
+library(performance)
+```
+
+## Uploading my Dataset
+
+```{r}
+main_dataset <- read.csv("D:/Data Science/Statistical Analysis and Modeling/Coursework 1/House Price/Dataset/Main Dataset.csv", stringsAsFactors = FALSE)
+```
+
+## Printing the first 10 instances of my dataset from each attribute
+
+```{r}
+View(main_dataset)
+head(main_dataset, 10)
+```
+
+## Filtering Unwanted Attributes
+
+```{r}
+f_data <- dataset[, c("Id", "MSSubClass", "LotArea", "LandContour", "Utilities", "Neighborhood", 
+                             "Condition1", "Condition2", "BldgType", "OverallQual", "OverallCond", "YearBuilt",
+                             "YearRemodAdd", "Heating", "HeatingQC", "CentralAir", "Electrical", "KitchenQual",
+                             "GarageType", "GarageCars", "MoSold", "YrSold", "SalePrice")]
+```
+
+## Printing Filtered Attributes
+
+```{r}
+f_data
+```
+
+## Checking the filtered attributes
+```{r}
+names(f_data)
+```
+## Changing categorical data from string to factor
+```{r}
+f_data$LandContour <- as.factor(f_data$LandContour)
+f_data$Utilities <- as.factor(f_data$Utilities)
+f_data$Neighborhood <- as.factor(f_data$Neighborhood)
+f_data$Condition1 <- as.factor(f_data$Condition1)
+f_data$Condition2 <- as.factor(f_data$Condition2)
+f_data$BldgType <- as.factor(f_data$BldgType)
+f_data$Heating <- as.factor(f_data$Heating)
+f_data$HeatingQC <- as.factor(f_data$HeatingQC)
+f_data$CentralAir <- as.factor(f_data$CentralAir)
+f_data$Electrical <- as.factor(f_data$Electrical)
+f_data$KitchenQual <- as.factor(f_data$KitchenQual)
+f_data$GarageType <- as.factor(f_data$GarageType)
+```
+
+
+## Checking the empty values Dataset
+
+```{r}
+is.na(f_data)
+```
+
+## Finding the sum of empty values in whole dataset
+
+```{r}
+sum(is.na(f_data))
+```
+
+## Removing the rows with empty values in whole dataset
+
+```{r}
+f_data1 <- na.omit(f_data)
+```
+
+## Finding the sum of empty values in whole dataset
+
+```{r}
+sum(is.na(f_data1))
+```
+
+## Comparing the sum of empty values
+
+```{r}
+sum(is.na(f_data))
+sum(is.na(f_data1))
+```
+
+## Checking the structure of filtered dataset
+
+```{r}
+str(f_data1)
+```
+
+## Checking the summary of filtered dataset
+
+```{r}
+summary(f_data1)
+```
+
+## Creating bar plot of all the categorical attributes
+```{r}
+data <- data.frame(f_data1)
+chart1 = ggplot(data, aes(x=LandContour)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart2 = ggplot(data, aes(x=f_data1$Utilities)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart3 = ggplot(data, aes(x=f_data1$Neighborhood)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart4 = ggplot(data, aes(x=f_data1$Condition1)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart5 = ggplot(data, aes(x=f_data1$Condition2)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart6 = ggplot(data, aes(x=f_data1$BldgType)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart7 = ggplot(data, aes(x=f_data1$Heating)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart8 = ggplot(data, aes(x=f_data1$HeatingQC)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart9 = ggplot(data, aes(x=f_data1$CentralAir)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart10 = ggplot(data, aes(x=f_data1$Electrical)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart11 = ggplot(data, aes(x=f_data1$KitchenQual)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chart12 = ggplot(data, aes(x=f_data1$GarageType)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust =1))
+```
+
+## Showing all the barplots
+```{r}
+chart1
+chart2
+chart3
+chart4
+chart5
+chart6
+chart7
+chart8
+chart9
+chart10
+chart11
+chart12
+#grid.arrange(chart1, chart2, chart3, 
+ #            ncol=2, nrow=3)
+```
+## Creating the Boxplot to check the prices in different area
+```{r}
+#chart1 = ggplot(data, aes(x= Neighborhood, y= SalePrice)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chartX = ggplot(data, aes(x= Neighborhood, y= SalePrice)) + geom_boxplot() + geom_hline(aes(yintercept=mean(data$SalePrice)), colour = "red", linetype= "dashed", lwd=0.5) + scale_y_continuous(labels = dollar_format()) + theme(axis.text.x = element_text(angle = 90, hjust =1))
+chartX
+```
+
+## Creating the density graph to check the distribution of data and skewness
+```{r}
+chart_d1 = ggplot(data = data, aes(x = MSSubClass)) + geom_density( fill = "yellow", color = "black")
+chart_d2 = ggplot(data = data, aes(x = LotArea)) + geom_density( fill = "yellow", color = "black")
+chart_d3 = ggplot(data = data, aes(x = OverallQual)) + geom_density( fill = "yellow", color = "black")
+chart_d4 = ggplot(data = data, aes(x = OverallCond)) + geom_density( fill = "yellow", color = "black")
+chart_d5 = ggplot(data = data, aes(x = YearBuilt)) + geom_density( fill = "yellow", color = "black")
+chart_d6 = ggplot(data = data, aes(x = YearRemodAdd)) + geom_density( fill = "yellow", color = "black")
+chart_d7 = ggplot(data = data, aes(x = GarageCars)) + geom_density( fill = "yellow", color = "black")
+chart_d8 = ggplot(data = data, aes(x = MoSold)) + geom_density( fill = "yellow", color = "black")
+chart_d9 = ggplot(data = data, aes(x = YrSold)) + geom_density( fill = "yellow", color = "black")
+```
+
+
+```{r}
+chart_d1
+chart_d2
+chart_d3
+chart_d4
+chart_d5
+chart_d6
+chart_d7
+chart_d8
+chart_d9
+```
+## Printing all the skewness values
+```{r}
+print(paste0("MSSubClass = " , skewness(data$MSSubClass)))
+print(paste0("LotArea = " , skewness(data$LotArea)))
+print(paste0("OverallQual = " , skewness(data$OverallQual)))
+print(paste0("OverallCond = " , skewness(data$OverallCond)))
+print(paste0("YearBuilt = " , skewness(data$YearBuilt)))
+print(paste0("YearRemodAdd = " , skewness(data$YearRemodAdd)))
+print(paste0("GarageCars = " , skewness(data$GarageCars)))
+print(paste0("MoSold = " , skewness(data$MoSold)))
+print(paste0("YrSold = " , skewness(data$YrSold)))
+```
+## Correlation  
+```{r}
+num_data <- select_if(data, is.numeric)
+corr_mat <- round(cor(num_data), 2)
+
+melted_corr_mat <- melt(corr_mat)
+head(melted_corr_mat)
+
+ggplot(data = melted_corr_mat, aes(x=Var1, y=Var2, fill=value)) + geom_tile() + geom_text(aes(Var2, Var1, label = value), color = "black", size = 4) + theme(axis.text.x = element_text(angle = 90, hjust =1))
+```
+
+## Looking for Outliers
+I will make scatter plot between yearbuilt and garaegcars
+
+## Modeling and Prediction
+
+## Structure of Filtered Data
+```{r}
+str(f_data1)
+```
+## Finding missing values
+```{r}
+sum(!complete.cases(f_data1))
+```
+## Splitting Dataset
+```{r}
+data_train <- f_data1[1:1300,]
+data_train
+
+data_test <- f_data1[1301:2757, ]
+#data_test <- subset (data_test, select = -SalePrice)
+data_test
+```
+## Primary Model - Random Forest
+```{r}
+set.seed(1)
+
+ranfor_model <- randomForest(x = data_train[, 1:22], 
+                          y = data_train$SalePrice,
+                          ntree = 100)
+
+ranfor_model
+```
+## Ploting Error and Variable importance chart
+```{r}
+plot(ranfor_model)
+varImpPlot(ranfor_model)
+
+```
+## Applying Model on test data
+```{r}
+ranfor_pred <- predict(ranfor_model, data_test)
+View(ranfor_pred)
+```
+
+## Cross Validation of Random Forest
+```{r}
+
+print(paste0("Root Mean Square Error (RMSE) = ", RMSE(ranfor_pred, data_test$SalePrice)))
+print(paste0("R Square Error (R2) = ", R2(ranfor_pred, data_test$SalePrice)))
+print(paste0("Mean Absolute Error (MAE) = ", MAE(ranfor_pred, data_test$SalePrice)))
+```
+
+
+## Second Model - Multiple Linear Regression
+```{r}
+set.seed(1)
+
+mul_reg <- lm(data_train$SalePrice ~., data = data_train)
+summary(mul_reg)
+#plot(mul_reg)
+
+```
+
+## Plotting Quantile Plot
+```{r}
+plot(mul_reg)
+```
+
+## Applying model on test data
+```{r}
+mulreg_pred <- predict(mul_reg, data_test)
+View(mulreg_pred)
+```
+
+## Cross Validation of Multiple Linear Regression 
+```{r}
+print(paste0("Root Mean Square Error (RMSE) = ", RMSE(mulreg_pred, data_test$SalePrice)))
+print(paste0("R Square Error (R2) = ", R2(mulreg_pred, data_test$SalePrice)))
+print(paste0("Mean Absolute Error (MAE) = ", MAE(mulreg_pred, data_test$SalePrice)))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
