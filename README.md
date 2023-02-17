@@ -1,4 +1,4 @@
-# HousePricePrediction
+# House Price Prediction using R Programming
 
 This project is about the analysis of the valuation of the property (Sale Prices). The main aim of this analysis is to predict the price of different properties located in certain areas. There are two algorithms required to do this analysis, a primary and a secondary algorithm. R programming language has been chosen for this analysis and R studio IDE is chosen for programming because it provides better statistical computing and graphics.
 
